@@ -20,11 +20,11 @@ public class JsonHelper {
     public static Map<Integer, String> convertJsonToMap() {
         ObjectMapper mapper = new ObjectMapper();
         try {
-            Map<String, String> map = mapper.readValue(new File(path), Map.class);
+            Map map = mapper.readValue(new File(path), Map.class);
 
             Map<Integer, String> map2 = new TreeMap<>();
-            for (String key: map.keySet()) {
-                map2.put(Integer.parseInt(key), map.get(key));
+            for (Object key: map.keySet()) {
+                map2.put(Integer.parseInt((String) key), (String) map.get(key));
             }
             return map2;
         } catch (Exception e) {

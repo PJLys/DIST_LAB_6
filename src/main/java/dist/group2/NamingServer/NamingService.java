@@ -18,8 +18,8 @@ import static dist.group2.NamingServer.JsonHelper.convertMapToJson;
 
 @Service
 public class NamingService {
-    private Map<Integer, String> repository;
-    private String multicastGroup = "224.0.0.5";
+    private final Map<Integer, String> repository;
+    private final String multicastGroup = "224.0.0.5";
 
     @Bean
     public MulticastReceivingChannelAdapter multicastReceiver(DatagramSocket socket) {
@@ -64,8 +64,7 @@ public class NamingService {
     }
 
     public Integer hashValue(String name) {
-        Integer hash = Math.abs(name.hashCode()) % 32769;
-        return hash;
+        return Math.abs(name.hashCode()) % 32769;
     }
 
     public void respondToMulticast(String nodeIP) throws IOException {
@@ -110,11 +109,9 @@ public class NamingService {
         if (hashes.isEmpty()) {
             throw new IllegalStateException("There is no node in the database!");
         } else {
-            List<Integer> smallerHashes = new ArrayList();
-            Iterator var5 = hashes.iterator();
+            List<Integer> smallerHashes = new ArrayList<>();
 
-            while(var5.hasNext()) {
-                Integer hash = (Integer)var5.next();
+            for (Integer hash : hashes) {
                 if (hash < fileHash) {
                     smallerHashes.add(hash);
                 }
