@@ -8,6 +8,7 @@ import java.util.TreeMap;
 
 public class JsonHelper {
     private static final String path = "src/files/map.json";
+
     public static void convertMapToJson(Map<Integer, String> map) {
         ObjectMapper mapper = new ObjectMapper();
         try {
@@ -23,7 +24,7 @@ public class JsonHelper {
             Map map = mapper.readValue(new File(path), Map.class);
 
             Map<Integer, String> map2 = new TreeMap<>();
-            for (Object key: map.keySet()) {
+            for (Object key : map.keySet()) {
                 map2.put(Integer.parseInt((String) key), (String) map.get(key));
             }
             return map2;
