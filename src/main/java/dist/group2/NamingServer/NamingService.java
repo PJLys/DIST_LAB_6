@@ -7,7 +7,6 @@ import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.integration.ip.udp.MulticastReceivingChannelAdapter;
 import org.springframework.messaging.Message;
 import org.springframework.stereotype.Service;
-
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -21,12 +20,6 @@ import static dist.group2.NamingServer.JsonHelper.convertMapToJson;
 public class NamingService {
     private final Map<Integer, String> repository;
     private final String multicastGroup = "224.0.0.5";
-
-    @Autowired
-    public NamingService() {
-        // repository = convertJsonToMap();
-        repository = new TreeMap<>();
-    }
 
     @Bean
     public MulticastReceivingChannelAdapter multicastReceiver(DatagramSocket socket) {
@@ -62,6 +55,12 @@ public class NamingService {
 
         // Respond to Multicast
         respondToMulticast(IPAddress);
+    }
+
+    @Autowired
+    public NamingService() {
+        // repository = convertJsonToMap();
+        repository = new TreeMap<>();
     }
 
     public Integer hashValue(String name) {
@@ -105,49 +104,13 @@ public class NamingService {
     @Transactional
     public synchronized String findFile(String fileName) {
         int fileHash = this.hashValue(fileName);
-        Set<Integer> hashes = repository.keySet();
-
-        if (hashes.isEmpty()) {
-            throw new IllegalStateException("There is no node in the database!");
-        } else {
-            List<Integer> smallerHashes = new ArrayList<>();
-
-            for (Integer hash : hashes) {
-                if (hash < fileHash) {
-                    smallerHashes.add(hash);
-                }
-            }
-
-            if (smallerHashes.isEmpty()) {
-                return repository.get(Collections.max(hashes));
-            } else {
-                return repository.get(Collections.max(smallerHashes));
-            }
-        }
+        return repository.get(findNodeForHash(fileHash));
     }
 
     @Transactional
     public synchronized int findNodeIdForFile(String fileName) {
         int fileHash = this.hashValue(fileName);
-        Set<Integer> hashes = repository.keySet();
-
-        if (hashes.isEmpty()) {
-            throw new IllegalStateException("There is no node in the database!");
-        } else {
-            List<Integer> smallerHashes = new ArrayList<>();
-
-            for (Integer hash : hashes) {
-                if (hash < fileHash) {
-                    smallerHashes.add(hash);
-                }
-            }
-
-            if (smallerHashes.isEmpty()) {
-                return Collections.max(hashes);
-            } else {
-                return Collections.max(smallerHashes);
-            }
-        }
+        return findNodeForHash(fileHash);
     }
 
     @Transactional
@@ -158,5 +121,28 @@ public class NamingService {
             System.out.println("There is no node with ID " + nodeID + " in the repository");
         }
         return IPAddress;
+    }
+
+    @Transactional
+    public int findNodeForHash(int hashValue) {
+        Set<Integer> hashes = repository.keySet();
+
+        if (hashes.isEmpty()) {
+            throw new IllegalStateException("There is no node in the database!");
+        } else {
+            List<Integer> smallerHashes = new ArrayList<>();
+
+            for (Integer hash : hashes) {
+                if (hash < hashValue) {
+                    smallerHashes.add(hash);
+                }
+            }
+
+            if (smallerHashes.isEmpty()) {
+                return Collections.max(hashes);
+            } else {
+                return Collections.max(smallerHashes);
+            }
+        }
     }
 }

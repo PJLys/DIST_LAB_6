@@ -46,4 +46,10 @@ public class NamingController {
         String ipAddress = this.service.getIPAddress(nodeID);
         return ResponseEntity.ok(ipAddress);
     }
+
+    @GetMapping("/nodes/{nodeID}/previousNode")
+    public ResponseEntity<Integer> getPreviousNodeID(@PathVariable("nodeID") int nodeID) {
+        int result = this.service.findNodeForHash(nodeID);
+        return ResponseEntity.ok(result);
+    }
 }
