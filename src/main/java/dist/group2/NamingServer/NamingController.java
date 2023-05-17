@@ -35,6 +35,12 @@ public class NamingController {
         return ResponseEntity.ok(result);
     }
 
+    @GetMapping("/files/{fileName}/nodeID")
+    public ResponseEntity<Integer> findNodeIdForFile(@PathVariable("fileName") String fileName) {
+        int result = this.service.findNodeIdForFile(fileName);
+        return ResponseEntity.ok(result);
+    }
+
     @GetMapping("/nodes/{nodeID}/ip")
     public ResponseEntity<String> getIPAddress(@PathVariable("nodeID") int nodeID) {
         String ipAddress = this.service.getIPAddress(nodeID);

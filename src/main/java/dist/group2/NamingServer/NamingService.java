@@ -126,6 +126,30 @@ public class NamingService {
     }
 
     @Transactional
+    public synchronized int findNodeIdForFile(String fileName) {
+        int fileHash = this.hashValue(fileName);
+        Set<Integer> hashes = repository.keySet();
+
+        if (hashes.isEmpty()) {
+            throw new IllegalStateException("There is no node in the database!");
+        } else {
+            List<Integer> smallerHashes = new ArrayList<>();
+
+            for (Integer hash : hashes) {
+                if (hash < fileHash) {
+                    smallerHashes.add(hash);
+                }
+            }
+
+            if (smallerHashes.isEmpty()) {
+                return Collections.max(hashes);
+            } else {
+                return Collections.max(smallerHashes);
+            }
+        }
+    }
+
+    @Transactional
     public synchronized String getIPAddress(int nodeID) {
         System.out.println("Request IP of node with ID " + nodeID);
         String IPAddress = repository.getOrDefault(nodeID, "NotFound");
