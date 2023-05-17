@@ -104,27 +104,6 @@ public class NamingService {
     @Transactional
     public synchronized String findFile(String fileName) {
         int fileHash = this.hashValue(fileName);
-        return repository.get(findNodeForHash(fileHash));
-    }
-
-    @Transactional
-    public synchronized int findNodeIdForFile(String fileName) {
-        int fileHash = this.hashValue(fileName);
-        return findNodeForHash(fileHash);
-    }
-
-    @Transactional
-    public synchronized String getIPAddress(int nodeID) {
-        System.out.println("Request IP of node with ID " + nodeID);
-        String IPAddress = repository.getOrDefault(nodeID, "NotFound");
-        if (IPAddress.equals("NotFound")) {
-            System.out.println("There is no node with ID " + nodeID + " in the repository");
-        }
-        return IPAddress;
-    }
-
-    @Transactional
-    public int findNodeForHash(int hashValue) {
         Set<Integer> hashes = repository.keySet();
 
         if (hashes.isEmpty()) {
@@ -133,7 +112,31 @@ public class NamingService {
             List<Integer> smallerHashes = new ArrayList<>();
 
             for (Integer hash : hashes) {
-                if (hash < hashValue) {
+                if (hash < fileHash) {
+                    smallerHashes.add(hash);
+                }
+            }
+
+            if (smallerHashes.isEmpty()) {
+                return repository.get(Collections.max(hashes));
+            } else {
+                return repository.get(Collections.max(smallerHashes));
+            }
+        }
+    }
+
+    @Transactional
+    public synchronized int findNodeIdForFile(String fileName) {
+        int fileHash = this.hashValue(fileName);
+        Set<Integer> hashes = repository.keySet();
+
+        if (hashes.isEmpty()) {
+            throw new IllegalStateException("There is no node in the database!");
+        } else {
+            List<Integer> smallerHashes = new ArrayList<>();
+
+            for (Integer hash : hashes) {
+                if (hash < fileHash) {
                     smallerHashes.add(hash);
                 }
             }
@@ -144,5 +147,15 @@ public class NamingService {
                 return Collections.max(smallerHashes);
             }
         }
+    }
+
+    @Transactional
+    public synchronized String getIPAddress(int nodeID) {
+        System.out.println("Request IP of node with ID " + nodeID);
+        String IPAddress = repository.getOrDefault(nodeID, "NotFound");
+        if (IPAddress.equals("NotFound")) {
+            System.out.println("There is no node with ID " + nodeID + " in the repository");
+        }
+        return IPAddress;
     }
 }
