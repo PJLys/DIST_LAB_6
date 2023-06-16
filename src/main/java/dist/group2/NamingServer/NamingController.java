@@ -58,4 +58,10 @@ public class NamingController {
         int result = this.service.findNodeForHash(nodeID);
         return ResponseEntity.ok(result);
     }
+
+    @GetMapping("/nodes/{nodeID}/nextNode")
+    public ResponseEntity<Integer> getNextNodeID(@PathVariable("nodeID") int nodeID) {
+        int result = this.service.findNextNodeID(nodeID);
+        return ResponseEntity.ok(result);
+    }
 }

@@ -18,7 +18,7 @@ import static dist.group2.NamingServer.JsonHelper.convertMapToJson;
 
 @Service
 public class NamingService {
-    private final Map<Integer, String> repository;
+    private final TreeMap<Integer, String> repository;
     private final String multicastGroup = "224.0.0.5";
 
     @Bean
@@ -134,24 +134,19 @@ public class NamingService {
 
     @Transactional
     public int findNodeForHash(int hashValue) {
-        Set<Integer> hashes = repository.keySet();
-
-        if (hashes.isEmpty()) {
-            throw new IllegalStateException("There is no node in the database!");
-        } else {
-            List<Integer> smallerHashes = new ArrayList<>();
-
-            for (Integer hash : hashes) {
-                if (hash < hashValue) {
-                    smallerHashes.add(hash);
-                }
-            }
-
-            if (smallerHashes.isEmpty()) {
-                return Collections.max(hashes);
-            } else {
-                return Collections.max(smallerHashes);
-            }
+        Integer key = this.repository.lowerKey(hashValue);
+        if (key == null) {
+            key = this.repository.lastKey();
         }
+        return key;
+    }
+
+    @Transactional
+    public int findNextNodeID(int nodeID) {
+        Integer key = this.repository.higherKey(nodeID);
+        if (key == null) {
+            key = this.repository.firstKey();
+        }
+        return  key;
     }
 }
