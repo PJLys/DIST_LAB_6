@@ -29,6 +29,12 @@ public class NamingController {
         return ResponseEntity.noContent().build();
     }
 
+    @DeleteMapping("/nodes/ID/{nodeId}")
+    public ResponseEntity<Void> deleteNodeById(@PathVariable("nodeId") int nodeId) {
+        this.service.deleteNodeById(nodeId);
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping("/files/{fileName}")
     public ResponseEntity<String> findFile(@PathVariable("fileName") String fileName) {
         String result = this.service.findFile(fileName);

@@ -101,6 +101,15 @@ public class NamingService {
         System.out.println("Hash of " + nodeName + " is removed from the database");
     }
 
+    public synchronized void deleteNodeById(int nodeId) {
+        if (!repository.containsKey(nodeId)) {
+            throw new IllegalStateException("There is no node with Id" + nodeId);
+        }
+        repository.remove(nodeId);
+        convertMapToJson(repository);
+        System.out.println("Node with ID " + nodeId + " is removed from the database");
+    }
+
     @Transactional
     public synchronized String findFile(String fileName) {
         int fileHash = this.hashValue(fileName);
